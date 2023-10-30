@@ -4,7 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"strconv"
+	"time"
 
+	"github.com/rgeoghegan/tabulate"
 	"github.com/unpoller/unifi"
 )
 
@@ -49,9 +52,26 @@ func main() {
 
 	var output string
 	idx := 0
+	rows := make([][]string, 0)
+	header := []string{"#", "ID", "IP", "Hostname", "Name", "MAC", "Last seen"}
 	for _, client := range clients {
-		fmt.Println(idx+1, client.ID, client.Hostname, client.IP, client.Name, client.Mac, client.LastSeen)
+		lastSeen := time.Unix(int64(client.LastSeen.Val), 0)
+		rows = append(rows, []string{
+			strconv.FormatInt(int64(idx+1), 10),
+			client.ID,
+			client.IP,
+			client.Hostname,
+			client.Name,
+			client.Mac,
+			lastSeen.String(),
+		})
+		//fmt.Printf("% 2d) %s\t%s %s %s %s %v\n", idx+1, client.ID, client.IP, client.Hostname, client.Name, client.Mac, lastSeen)
 		output += fmt.Sprintf("%s\n", client.IP)
 		idx++
 	}
+	table, err := tabulate.Tabulate(rows, &tabulate.Layout{Headers: header, Format: tabulate.SimpleFormat})
+	if err != nil {
+		log.Fatalf("Failed to tabulate text: %v", err)
+	}
+	fmt.Println(table)
 }
