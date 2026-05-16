@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/rgeoghegan/tabulate v0.0.0-20220217214430-080333e57818
+	github.com/spf13/pflag v1.0.10
 	github.com/unpoller/unifi v0.3.15
 )
 
